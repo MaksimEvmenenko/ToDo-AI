@@ -1,0 +1,46 @@
+# ToDo-AI Project Rules for IDE Assistance
+
+## Code Style
+- Use Spring Boot best practices
+- Follow Java naming conventions (camelCase for methods/variables, PascalCase for classes)
+- Maximum line length: 120 characters
+- Always use dependency injection with @RequiredArgsConstructor (Lombok)
+- Add JavaDoc comments for public methods
+
+## Architecture Guidelines
+- Controllers: Handle HTTP requests, delegate to service
+- Services: Contain business logic, use repositories for data access
+- Repositories: Use Spring Data JPA, minimal custom logic
+- Models: JPA entities with proper annotations
+- DTOs: For API request/response data transfer
+
+## REST API Conventions
+- Base path: `/api`
+- Version prefix: `v1`, `v2`, etc.
+- HTTP Methods: GET (read), POST (create), PUT (update), DELETE (delete)
+- Status codes: 200 (OK), 201 (Created), 204 (No Content), 400 (Bad Request), 404 (Not Found), 500 (Server Error)
+- Response format: JSON with camelCase keys
+
+## Spring Boot Configuration
+- Use application.properties for configuration
+- Environment-specific profiles: application-dev.properties, application-prod.properties
+- Enable validation with @Valid on request DTOs
+- Use @Transactional for service layer methods that modify data
+
+## Testing Conventions
+- Test classes: Use @SpringBootTest for integration tests
+- Unit tests: Use Mockito for mocking dependencies
+- Test naming: testDescribeWhat_ThenExpectWhat()
+
+## Important Files
+- pom.xml: Dependency management
+- application.properties: Configuration
+- .claude: Project context for Claude
+- README.md: Project documentation
+
+## Common Commands
+- Build: `mvn clean install`
+- Run: `mvn spring-boot:run`
+- Test: `mvn test`
+- Package: `mvn package`
+

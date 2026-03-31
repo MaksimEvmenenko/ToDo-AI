@@ -1,0 +1,34 @@
+# Build and dependency directories
+target/
+node_modules/
+.gradle/
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+
+# OS specific
+Thumbs.db
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
