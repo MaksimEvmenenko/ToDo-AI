@@ -9,12 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service layer for Todo management
+ * Uses MapStruct mapper for DTO/Entity conversions
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TodoService {
 
     private final TodoRepository todoRepository;
+    // MapStruct mapper will be injected here
+    // private final TodoMapper todoMapper;
 
     public List<TodoDTO> getAllTodos() {
         return todoRepository.findAll().stream()
