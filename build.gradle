@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.todoai'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+description = 'AI-powered Todo Application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring Boot Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // AWS SDK for DynamoDB
+    implementation 'software.amazon.awssdk:dynamodb:2.21.0'
+
+    // Spring Cloud AWS for DynamoDB Integration
+    implementation 'io.awspring.cloud:spring-cloud-aws-dynamodb:3.0.0'
+
+    // MapStruct for entity mapping
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Configure Java version
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+// Spring Boot configuration
+tasks.named('bootJar') {
+    mainClass = 'com.todoai.ToDoAiApplication'
+}
+
+// Lombok and MapStruct annotation processing
+tasks.compileJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
