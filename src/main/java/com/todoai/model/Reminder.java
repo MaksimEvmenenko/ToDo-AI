@@ -8,28 +8,28 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "todos")
+@Table(name = "reminders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Todo {
+public class Reminder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(length = 1000)
-    private String description;
+    private Long todoId;
 
     @Column(nullable = false)
-    private Boolean completed = false;
+    private LocalDateTime scheduledTime;
 
     @Column(nullable = false)
-    private Boolean reminderEnabled = false;
+    private Boolean sent = false;
+
+    @Column(length = 500)
+    private String notificationMessage;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

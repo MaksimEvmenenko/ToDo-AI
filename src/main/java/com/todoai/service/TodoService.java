@@ -87,6 +87,7 @@ public class TodoService {
                 .title(todo.getTitle())
                 .description(todo.getDescription())
                 .completed(todo.getCompleted())
+                .reminderEnabled(todo.getReminderEnabled())
                 .createdAt(todo.getCreatedAt())
                 .updatedAt(todo.getUpdatedAt())
                 .build();

@@ -22,6 +22,8 @@ public class TodoDTO {
 
     private Boolean completed;
 
+    private Boolean reminderEnabled;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
