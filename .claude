@@ -2,46 +2,19 @@
   "name": "ToDo-AI",
   "description": "AI-powered Todo Application built with Spring Boot",
   "type": "java-spring-boot",
-  "javaVersion": "17",
-  "framework": "Spring Boot 3.2.3",
-  "architecture": {
-    "pattern": "MVC with Service Layer",
-    "layers": [
-      "Controller - REST API endpoints",
-      "Service - Business logic",
-      "Repository - Data access",
-      "Model - Entity definitions",
-      "DTO - Data transfer objects"
-    ]
-  },
-  "apiBase": "/api",
-  "apiVersions": ["v1"],
-  "mainPackage": "com.todoai",
-  "database": {
-    "type": "H2",
-    "name": "tododb",
-    "mode": "in-memory (development)"
-  },
-  "dependencies": {
-    "spring-boot-starter-web": "3.2.3",
-    "spring-boot-starter-data-jpa": "3.2.3",
-    "spring-boot-starter-validation": "3.2.3",
-    "h2": "runtime",
-    "lombok": "utility"
-  },
-  "conventions": {
-    "naming": "camelCase for variables/methods, PascalCase for classes",
-    "apiNaming": "/api/v{version}/{resource}/{action}",
-    "packageStructure": "com.todoai.{controller,service,repository,model,dto}",
-    "dataFormat": "JSON",
-    "timestamps": "LocalDateTime with UTC"
-  },
-  "keyFeatures": [
-    "CRUD operations for todos",
-    "Filter by completion status",
-    "JPA with automatic timestamps",
-    "Input validation using Jakarta Validation",
-    "Lombok for boilerplate reduction"
-  ]
+  "version": "1.0.0",
+  "imports": [
+    "@import .claude-config.md",
+    "@import .claude-skills.md",
+    "@import .claude-architecture.md",
+    "@import .claude-conventions.md",
+    "@import .claude-features.md"
+  ],
+  "metadata": {
+    "created": "2025-01-01",
+    "updated": "2026-04-03",
+    "maintainer": "Development Team",
+    "status": "Active Development"
+  }
 }
 
