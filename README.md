@@ -1,228 +1,251 @@
 # ToDo-AI
 
-AI-powered Todo Application built with Spring Boot 3.2.3 and Java 17.
+AI-powered Todo Application with Spring Boot 3.2.3, JWT Authentication, and Reminder Scheduling.
+
+**Status**: ✅ Ready to build and deploy
+
+---
+
+## Quick Start
+
+```bash
+# 1. Build
+./gradlew clean build -x test
+
+# 2. Setup database
+mysql -u root -p
+CREATE DATABASE todoai;
+USE todoai;
+source schema.sql;
+
+# 3. Run
+./gradlew bootRun
+```
+
+App available at: `http://localhost:8080/api`
+
+---
+
+## Key Features
+
+- ✅ **User Authentication**: JWT-based login/signup with refresh tokens
+- ✅ **Todo Management**: Create, read, update, delete todos
+- ✅ **Reminders**: Schedule reminders with automatic notifications
+- ✅ **Security**: BCrypt password hashing, Spring Security
+- ✅ **REST API**: Full-featured API with proper error handling
+- ✅ **Database**: MySQL/PostgreSQL with automatic schema migration
+
+---
+
+## Technology Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Framework | Spring Boot 3.2.3 |
+| Java | 17+ |
+| Database | MySQL 8.0+ / PostgreSQL 12+ |
+| Build | Gradle 7.6+ |
+| ORM | JPA/Hibernate |
+| Auth | JWT (HS512) |
+| Password | BCrypt |
+
+---
 
 ## Project Structure
 
 ```
 src/main/
 ├── java/com/todoai/
-│   ├── controller/        # REST API endpoints
-│   ├── service/          # Business logic layer
-│   ├── repository/       # Data access layer (Spring Data JPA)
-│   ├── model/            # JPA entity definitions
-│   ├── dto/              # Data Transfer Objects
-│   └── ToDoAiApplication.java  # Main Spring Boot application
+│   ├── controller/     # REST API endpoints
+│   ├── service/        # Business logic
+│   ├── repository/     # Data access layer
+│   ├── model/          # JPA entities
+│   ├── dto/            # Data Transfer Objects
+│   ├── config/         # Configuration classes
+│   ├── security/       # Security components
+│   └── ToDoAiApplication.java
 └── resources/
-    ├── application.properties  # Configuration
+    └── application.properties
 ```
 
-## Technologies
+---
 
-- **Framework**: Spring Boot 3.2.3
-- **Java Version**: 17
-- **Database**: H2 (in-memory for development)
-- **ORM**: JPA/Hibernate
-- **Build Tool**: Maven
-- **Utilities**: Lombok
-- **Validation**: Jakarta Validation
+## Documentation
 
-## Getting Started
+- **[BUILD.md](BUILD.md)** - Building, setup, deployment
+- **[API.md](API.md)** - Complete API documentation with examples
+- **[SECURITY.md](SECURITY.md)** - Authentication, configuration, best practices
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development guidelines and architecture
+- **[schema.sql](schema.sql)** - Database schema
+
+---
+
+## API Endpoints
+
+### Authentication (Public)
+- `POST /v1/auth/signup` - Register new user
+- `POST /v1/auth/login` - Login and get tokens
+- `POST /v1/auth/refresh` - Refresh access token
+- `GET /v1/auth/me` - Get current user (protected)
+
+### Todos (All Protected)
+- `GET /v1/todo/list` - Get all todos
+- `GET /v1/todo/list/active` - Get incomplete todos
+- `GET /v1/todo/list/completed` - Get completed todos
+- `GET /v1/todo/{id}` - Get specific todo
+- `POST /v1/todo` - Create todo
+- `PUT /v1/todo/{id}` - Update todo
+- `DELETE /v1/todo/{id}` - Delete todo
+
+### Reminders (All Protected)
+- `GET /v1/reminder/list` - Get all reminders
+- `GET /v1/reminder/{id}` - Get specific reminder
+- `POST /v1/reminder` - Create reminder
+- `PUT /v1/reminder/{id}` - Update reminder
+- `DELETE /v1/reminder/{id}` - Delete reminder
+- `POST /v1/reminder/{id}/send` - Trigger notification
+
+---
+
+## Quick Examples
+
+### Sign Up
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username":"user",
+    "email":"user@example.com",
+    "password":"SecurePass123!"
+  }'
+```
+
+### Login
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"user","password":"SecurePass123!"}'
+```
+
+### Create Todo (with token)
+```bash
+curl -X POST http://localhost:8080/api/v1/todo \
+  -H "Authorization: Bearer {TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Buy groceries","description":"Milk, eggs"}'
+```
+
+See [API.md](API.md) for complete API documentation.
+
+---
+
+## Setup & Deployment
 
 ### Prerequisites
-- Java 17 or higher
-- Maven 3.6+
+- Java 17+
+- Gradle (or use `./gradlew`)
+- MySQL or PostgreSQL
 
-### Installation
-
+### Build
 ```bash
-# Clone the repository
-cd /Users/maksim_evmenenko/Projects/ToDo-AI
-
-# Build the project
-mvn clean install
-
-# Run the application
-mvn spring-boot:run
+./gradlew clean build -x test
 ```
 
-The application will be available at `http://localhost:8080/api`
-
-## API Documentation
-
-### Base URL
-```
-http://localhost:8080/api
-```
-
-### Endpoints
-
-#### 1. Get All Todos
-```
-GET /v1/todo/list
-```
-Returns a list of all todos.
-
-**Response Example:**
-```json
-[
-  {
-    "id": 1,
-    "title": "Buy groceries",
-    "description": "Milk, eggs, bread",
-    "completed": false,
-    "createdAt": "2026-03-31T10:30:00",
-    "updatedAt": "2026-03-31T10:30:00"
-  }
-]
-```
-
-#### 2. Get Active (Incomplete) Todos
-```
-GET /v1/todo/list/active
-```
-Returns todos that are not completed.
-
-#### 3. Get Completed Todos
-```
-GET /v1/todo/list/completed
-```
-Returns todos that are marked as completed.
-
-#### 4. Get Todo by ID
-```
-GET /v1/todo/{id}
-```
-Returns a specific todo by its ID.
-
-**Example:**
-```
-GET /v1/todo/1
-```
-
-#### 5. Create a New Todo
-```
-POST /v1/todo
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "title": "Buy groceries",
-  "description": "Milk, eggs, bread"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "title": "Buy groceries",
-  "description": "Milk, eggs, bread",
-  "completed": false,
-  "createdAt": "2026-03-31T10:30:00",
-  "updatedAt": "2026-03-31T10:30:00"
-}
-```
-
-#### 6. Update a Todo
-```
-PUT /v1/todo/{id}
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "title": "Buy groceries and cook",
-  "description": "Updated description",
-  "completed": true
-}
-```
-
-#### 7. Delete a Todo
-```
-DELETE /v1/todo/{id}
-```
-
-**Response (204 No Content)**
-
-## Example Requests Using cURL
-
+### Database
 ```bash
-# Get all todos
-curl http://localhost:8080/api/v1/todo/list
-
-# Create a new todo
-curl -X POST http://localhost:8080/api/v1/todo \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Learn Spring Boot","description":"Complete the tutorial"}'
-
-# Update a todo
-curl -X PUT http://localhost:8080/api/v1/todo/1 \
-  -H "Content-Type: application/json" \
-  -d '{"completed":true}'
-
-# Delete a todo
-curl -X DELETE http://localhost:8080/api/v1/todo/1
-
-# Get active todos
-curl http://localhost:8080/api/v1/todo/list/active
-
-# Get completed todos
-curl http://localhost:8080/api/v1/todo/list/completed
+mysql -u root -p todoai < schema.sql
 ```
+
+### Run
+```bash
+./gradlew bootRun
+```
+
+See [BUILD.md](BUILD.md) for detailed setup instructions.
+
+---
+
+## Security
+
+- **Authentication**: JWT with HS512 signature
+- **Password**: BCrypt hashing with unique salts
+- **Authorization**: Spring Security with role-based access
+- **Input Validation**: Jakarta Validation on all endpoints
+- **CORS**: Configured for localhost (update for production)
+
+**Production Checklist**: See [SECURITY.md](SECURITY.md)
+
+Key steps:
+- [ ] Change `jwt.secret` to secure random value
+- [ ] Enable HTTPS
+- [ ] Update CORS origins
+- [ ] Configure database encryption
+
+---
+
+## Configuration
+
+### Application Properties
+
+Edit `src/main/resources/application.properties`:
+
+**Database (MySQL)**:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/todoai
+spring.datasource.username=root
+spring.datasource.password=password
+```
+
+**JWT**:
+```properties
+jwt.secret=your-secret-key-change-this-in-production-minimum-32-chars-for-HS512
+jwt.expiration=3600000
+jwt.refresh-expiration=86400000
+```
+
+---
 
 ## Development
 
-### Database Console
-The H2 database console is available at:
-```
-http://localhost:8080/api/h2-console
-```
-
-### Build Commands
+### Run Tests
 ```bash
-# Clean and build
-mvn clean install
-
-# Run tests
-mvn test
-
-# Run the application
-mvn spring-boot:run
-
-# Package as JAR
-mvn package
+./gradlew test
 ```
 
-## Code Style and Conventions
+### Run Application
+```bash
+./gradlew bootRun
+```
 
-- **Naming**: camelCase for variables/methods, PascalCase for classes
-- **Annotations**: Use Lombok to reduce boilerplate (@Data, @RequiredArgsConstructor, @Builder)
-- **Layer Separation**: Controllers → Services → Repositories
-- **Validation**: Use Jakarta Validation annotations on DTOs
-- **Timestamps**: Automatic with JPA @PrePersist and @PreUpdate
+### Build JAR
+```bash
+./gradlew bootJar
+java -jar build/libs/todo-ai-1.0.0.jar
+```
 
-## Configuration Files
+See [DEVELOPMENT.md](DEVELOPMENT.md) for development guidelines.
 
-- `.claude` - Claude AI context and project metadata
-- `.cursorules` - IDE assistant rules and best practices
-- `.claudeignore` - Files to ignore for AI analysis
-- `pom.xml` - Maven dependencies and build configuration
-- `application.properties` - Spring Boot application configuration
+---
 
-## Future Enhancements
+## Troubleshooting
 
-- [ ] User authentication and authorization
-- [ ] Categories/Tags for todos
-- [ ] Due dates and reminders
-- [ ] AI-powered todo suggestions
-- [ ] PostgreSQL database integration
-- [ ] Docker containerization
-- [ ] API documentation with Swagger/OpenAPI
+**Build fails**: `./gradlew clean build -x test`
+**Port in use**: Change `server.port` in application.properties
+**DB connection fails**: Check database credentials
+**Auth errors**: Verify JWT secret length (min 32 chars)
+
+See [BUILD.md](BUILD.md) troubleshooting section for more.
+
+---
 
 ## License
 
-This project is open source and available under the MIT License.
+MIT License - See LICENSE file for details
+
+---
+
+**Need Help?**
+- Build & Setup: See [BUILD.md](BUILD.md)
+- API Reference: See [API.md](API.md)
+- Security Config: See [SECURITY.md](SECURITY.md)
+- Development: See [DEVELOPMENT.md](DEVELOPMENT.md)
