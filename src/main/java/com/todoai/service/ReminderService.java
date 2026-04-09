@@ -129,6 +129,7 @@ public class ReminderService {
      * Internal method to send notification
      * Triggers an endpoint that handles notification delivery
      */
+    @Transactional
     private void sendNotification(Reminder reminder) {
         try {
             Todo todo = todoRepository.findById(reminder.getTodoId())
