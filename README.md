@@ -227,6 +227,37 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for development guidelines.
 
 ---
 
+## GitHub Actions - CI/CD
+
+The project includes automated GitHub Actions workflows:
+
+### Build and Test Workflow
+**File**: `.github/workflows/build-and-test.yml`
+
+**Triggers**: 
+- Push to `main` or `develop` branches
+- Pull requests to `main` or `develop` branches
+
+**Steps**:
+1. ✅ Checkout code
+2. ✅ Setup JDK 17
+3. ✅ Build with Gradle
+4. ✅ Run unit tests
+5. ✅ Upload test results
+6. ✅ Publish test reports
+7. ✅ Run code quality checks
+
+**Artifacts**:
+- `test-results-17` - JUnit XML test results
+- `build-reports-17` - Build reports and test summaries
+
+**Status Badge**:
+```markdown
+[![Build and Test](https://github.com/YOUR_USERNAME/ToDo-AI/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/YOUR_USERNAME/ToDo-AI/actions/workflows/build-and-test.yml)
+```
+
+---
+
 ## Troubleshooting
 
 **Build fails**: `./gradlew clean build -x test`
