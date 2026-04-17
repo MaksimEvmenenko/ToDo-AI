@@ -1,0 +1,412 @@
+# IDE Assistant Rules for ToDo-AI Project
+
+This document is imported by `.claude` to provide comprehensive IDE assistant guidance.
+
+## Quick Reference
+
+- **Language**: Java 17
+- **Framework**: Spring Boot 3.2.3
+- **Build Tool**: Maven
+- **Package Root**: `com.todoai`
+- **API Base**: `/api/v1`
+- **Database**: H2 (development)
+
+## File Organization
+
+```
+.
+├── .claude                          # Main Claude configuration (with @imports)
+├── .claude-config.md                # Project configuration
+├── .claude-skills.md                # Skills & capabilities
+├── .claude-architecture.md          # Architecture patterns
+├── .claude-conventions.md           # Coding standards
+├── .claude-features.md              # Features & roadmap
+├── .cursorules                      # This file - IDE rules
+├── src/main/java/com/todoai/
+│   ├── ToDoAiApplication.java
+│   ├── config/                      # Spring configuration
+│   ├── controller/                  # REST endpoints
+│   ├── service/                     # Business logic
+│   ├── repository/                  # Data access
+│   ├── model/                       # JPA entities
+│   ├── dto/                         # Data transfer objects
+│   └── mapper/                      # Entity-DTO mapping
+├── src/main/resources/
+│   ├── application.properties       # Main configuration
+│   ├── application-dev.properties   # Dev profile
+│   └── application-prod.properties  # Prod profile
+├── pom.xml                          # Maven configuration
+└── README.md                        # Project documentation
+```
+
+---
+
+## Development Workflow
+
+### 1. Starting Development
+```bash
+cd /Users/maksim_evmenenko/Projects/ToDo-AI
+mvn clean install
+mvn spring-boot:run
+```
+
+### 2. Testing an Endpoint
+```bash
+curl http://localhost:8080/api/v1/todo/list
+```
+
+### 3. Making Code Changes
+1. Edit files in `src/main/java/com/todoai/`
+2. Spring Boot hot-reloads changes
+3. Test with curl or Postman
+
+### 4. Building for Deployment
+```bash
+mvn clean package
+```
+
+---
+
+## Code Organization Rules
+
+### Controllers
+- **Location**: `src/main/java/com/todoai/controller/`
+- **Naming**: `{Resource}Controller.java`
+- **Annotation**: `@RestController`
+- **Base Route**: `@RequestMapping("/api/v1/{resource}")`
+- **Methods**: Use `@GetMapping`, `@PostMapping`, `@PutMapping`, `@DeleteMapping`
+- **Validation**: Add `@Valid` to DTO parameters
+- **Documentation**: JavaDoc for all public methods
+
+**Example**:
+```java
+@RestController
+@RequestMapping("/api/v1/todo")
+@Slf4j
+@RequiredArgsConstructor
+public class TodoController {
+    private final TodoService service;
+
+    @GetMapping("/list")
+    public ResponseEntity<List<TodoDTO>> getAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+}
+```
+
+### Services
+- **Location**: `src/main/java/com/todoai/service/`
+- **Naming**: `{Resource}Service.java`
+- **Annotation**: `@Service`
+- **Injection**: `@RequiredArgsConstructor` with constructor parameters
+- **Transactions**: `@Transactional` for write operations
+- **Logic**: All business logic here, not in controllers
+
+**Example**:
+```java
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class TodoService {
+    private final TodoRepository repository;
+
+    @Transactional
+    public TodoDTO create(TodoDTO dto) {
+        Todo entity = mapper.toEntity(dto);
+        Todo saved = repository.save(entity);
+        return mapper.toDTO(saved);
+    }
+}
+```
+
+### Repositories
+- **Location**: `src/main/java/com/todoai/repository/`
+- **Naming**: `{Resource}Repository.java`
+- **Extends**: `JpaRepository<Entity, ID>`
+- **Methods**: Use Spring Data JPA query derivation
+- **Logic**: Data access only, no business logic
+
+**Example**:
+```java
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+    List<Todo> findByCompletedFalse();
+    List<Todo> findByCompletedTrue();
+}
+```
+
+### Models (Entities)
+- **Location**: `src/main/java/com/todoai/model/`
+- **Naming**: `{Resource}.java`
+- **Annotation**: `@Entity`
+- **ID**: `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)`
+- **Timestamps**: `createdAt`, `updatedAt` with `@PrePersist`, `@PreUpdate`
+- **Lombok**: Use `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`
+
+**Example**:
+```java
+@Entity
+@Table(name = "todos")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Todo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String title;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now(ZoneId.of("UTC"));
+    }
+}
+```
+
+### DTOs (Data Transfer Objects)
+- **Location**: `src/main/java/com/todoai/dto/`
+- **Naming**: `{Resource}DTO.java`
+- **Validation**: Include Jakarta Validation annotations
+- **Lombok**: Use `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`
+- **Purpose**: API input/output, not entities
+
+**Example**:
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TodoDTO {
+    private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(min = 1, max = 255)
+    private String title;
+}
+```
+
+### Configuration
+- **Location**: `src/main/java/com/todoai/config/`
+- **Naming**: `{Component}Config.java`
+- **Annotation**: `@Configuration`
+- **Purpose**: Spring beans, database config, etc.
+
+---
+
+## Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| **Classes** | PascalCase | `TodoController`, `TodoService` |
+| **Methods** | camelCase | `getTodoById()`, `createTodo()` |
+| **Variables** | camelCase | `todoList`, `savedEntity` |
+| **Constants** | UPPER_SNAKE_CASE | `DEFAULT_PAGE_SIZE`, `MAX_RETRIES` |
+| **Packages** | lowercase.dot | `com.todoai.controller` |
+| **Database Tables** | lowercase_plural | `todos`, `reminders` |
+| **Database Columns** | lowercase_snake | `created_at`, `updated_at` |
+
+---
+
+## REST API Standards
+
+### URL Patterns
+```
+GET    /api/v1/todo/list              - List all todos
+GET    /api/v1/todo/list/active       - List active todos
+GET    /api/v1/todo/list/completed    - List completed todos
+GET    /api/v1/todo/{id}              - Get single todo
+POST   /api/v1/todo                   - Create todo
+PUT    /api/v1/todo/{id}              - Update todo
+DELETE /api/v1/todo/{id}              - Delete todo
+```
+
+### HTTP Status Codes
+- `200 OK` - GET, PUT success
+- `201 Created` - POST success
+- `204 No Content` - DELETE success
+- `400 Bad Request` - Invalid input
+- `404 Not Found` - Resource not found
+- `500 Server Error` - Server error
+
+### Response Format
+```json
+{
+  "id": 1,
+  "title": "My Todo",
+  "description": "Description",
+  "completed": false,
+  "createdAt": "2026-04-03T10:30:00Z",
+  "updatedAt": "2026-04-03T10:30:00Z"
+}
+```
+
+---
+
+## Common Development Tasks
+
+### Add New Entity & Endpoints
+
+1. **Create Entity** in `model/`:
+```java
+@Entity
+@Table(name = "resources")
+@Data
+public class Resource {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    // ... fields
+}
+```
+
+2. **Create DTO** in `dto/`:
+```java
+@Data
+public class ResourceDTO {
+    private Long id;
+    // ... fields with validation
+}
+```
+
+3. **Create Repository** in `repository/`:
+```java
+public interface ResourceRepository extends JpaRepository<Resource, Long> {
+}
+```
+
+4. **Create Service** in `service/`:
+```java
+@Service
+@RequiredArgsConstructor
+public class ResourceService {
+    private final ResourceRepository repository;
+}
+```
+
+5. **Create Controller** in `controller/`:
+```java
+@RestController
+@RequestMapping("/api/v1/resource")
+@RequiredArgsConstructor
+public class ResourceController {
+    private final ResourceService service;
+}
+```
+
+### Update Configuration
+- Edit `src/main/resources/application.properties`
+- Add profiles: `application-dev.properties`, `application-prod.properties`
+- Use `spring.profiles.active=dev` to activate profiles
+
+### Run Tests
+```bash
+mvn test
+```
+
+### Clean Build
+```bash
+mvn clean
+mvn install
+```
+
+---
+
+## Code Quality Rules
+
+### Must Do
+- ✅ Use constructor injection with `@RequiredArgsConstructor`
+- ✅ Add `@Transactional` to service write methods
+- ✅ Validate input with `@Valid` in controllers
+- ✅ Use DTOs for API boundaries
+- ✅ Document public methods with JavaDoc
+- ✅ Use proper exception handling
+- ✅ Keep methods focused and short
+
+### Must Not Do
+- ❌ Field injection (`@Autowired`)
+- ❌ Business logic in controllers
+- ❌ Direct entity usage in APIs (always use DTOs)
+- ❌ Hardcoded values (use `@Value` or config)
+- ❌ Catch generic `Exception` (be specific)
+- ❌ Log sensitive data (passwords, tokens, PII)
+- ❌ Suppress warnings without reason
+
+### Line Length
+- Maximum: 120 characters
+- Preference: 80-100 characters for readability
+
+### Comments
+- Explain **why**, not **what**
+- Use JavaDoc for public methods
+- Keep comments up-to-date with code
+
+---
+
+## Git & Version Control
+
+### Commit Messages
+```
+feat: Add new todo endpoint
+fix: Handle null pointer in service
+docs: Update README with examples
+refactor: Simplify controller method
+test: Add tests for todo service
+```
+
+### Branch Naming
+- Feature: `feature/feature-name`
+- Bugfix: `bugfix/bug-name`
+- Release: `release/version-number`
+
+### .gitignore
+Already configured for:
+- Maven: `target/`, `.classpath`, `.project`
+- IDE: `.idea/`, `.vscode/`
+- Build: `*.class`, `*.jar`
+- OS: `.DS_Store`
+
+---
+
+## Debugging Tips
+
+### Enable Debug Logging
+In `application.properties`:
+```properties
+logging.level.com.todoai=DEBUG
+logging.level.org.springframework=INFO
+```
+
+### Check Database
+Visit: `http://localhost:8080/h2-console`
+- JDBC URL: `jdbc:h2:mem:tododb`
+- User: `sa`
+- Password: (empty)
+
+### Common Issues
+
+**Port already in use**: Kill process on port 8080
+```bash
+lsof -i :8080
+kill -9 <PID>
+```
+
+**Maven build fails**: Clean and rebuild
+```bash
+mvn clean install -U
+```
+
+**Changes not reflecting**: Restart Spring Boot
+```bash
+# Stop: Ctrl+C in terminal
+# Restart: mvn spring-boot:run
+```
+
+---
+
+## Resources
+
+- 📖 [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- 📖 [Spring Data JPA Guide](https://spring.io/projects/spring-data-jpa)
+- 📖 [Jakarta Validation](https://jakarta.ee/specifications/validation/)
+- 📖 [Project README](README.md)
+- 📖 [Development Guide](DEVELOPMENT.md)

@@ -1,0 +1,20 @@
+{
+  "name": "ToDo-AI",
+  "description": "AI-powered Todo Application built with Spring Boot",
+  "type": "java-spring-boot",
+  "version": "1.0.0",
+  "imports": [
+    "@import .claude-config.md",
+    "@import .claude-skills.md",
+    "@import .claude-architecture.md",
+    "@import .claude-conventions.md",
+    "@import .claude-features.md"
+  ],
+  "metadata": {
+    "created": "2025-01-01",
+    "updated": "2026-04-03",
+    "maintainer": "Development Team",
+    "status": "Active Development"
+  }
+}
+
